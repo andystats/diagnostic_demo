@@ -31,9 +31,19 @@
         }
         .theater-grid {
             display: grid;
-            grid-template-columns: repeat(50, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(9px, 1fr));
             gap: 3px;
             min-height: 180px;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+
+        @media (min-width: 900px) {
+            .theater-grid {
+                grid-template-columns: repeat(50, 1fr);
+                max-width: 510px;
+            }
         }
         .person-dot {
             width: 9px;
@@ -104,6 +114,7 @@
                  <button class="nav-btn active py-2 px-6 rounded-lg font-semibold" data-page="1">1. The Math Basics</button>
                  <button class="nav-btn py-2 px-6 rounded-lg font-semibold" data-page="2">2. Interactive Explorer</button>
                  <button class="nav-btn py-2 px-6 rounded-lg font-semibold" data-page="3">3. A Worked Example</button>
+                 <button class="nav-btn py-2 px-6 rounded-lg font-semibold" data-page="4">4. Bayesian Methods</button>
             </div>
         </div>
 
@@ -246,6 +257,154 @@
             </div>
         </div>
 
+        <!-- PAGE 4: BAYESIAN METHODS APPENDIX -->
+        <div id="page-4" class="page bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Bayesian Methods: The Deeper Framework</h2>
+            
+            <div class="space-y-8 text-lg text-gray-700 leading-relaxed">
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg">
+                    <p class="text-xl font-semibold text-indigo-800 mb-3">The diagnostic test calculations you've been exploring are actually a specific application of Bayes' theorem—the fundamental framework for updating beliefs with evidence.</p>
+                    <p>This appendix shows you how diagnostic testing fits into the broader landscape of Bayesian methods, helping you understand the deeper statistical principles at work.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Bayes' Theorem: The Connection</h3>
+                    <p class="mb-6">Diagnostic testing is just a specific case of Bayes' theorem. Click each card to see the mathematical relationship:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-purple-600">General Bayes' Formula</h4>
+                                    <p class="mt-2 text-base">The fundamental framework for updating beliefs with evidence.</p>
+                                </div>
+                                <div class="card-back"><span>$$P(D|T^+) = \frac{P(T^+|D) \cdot P(D)}{P(T^+)}$$</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-green-600">Positive Predictive Value</h4>
+                                    <p class="mt-2 text-base">What we want to know: probability of disease given a positive test.</p>
+                                </div>
+                                <div class="card-back"><span>$$PPV = P(D|T^+)$$</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-blue-600">Test Characteristics</h4>
+                                    <p class="mt-2 text-base">The performance properties of the diagnostic test.</p>
+                                </div>
+                                <div class="card-back"><span>$$P(T^+|D) = \text{Sensitivity}$$<br>$$P(T^-|D') = \text{Specificity}$$</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-red-600">Prior Probability</h4>
+                                    <p class="mt-2 text-base">What we believe before seeing the test result.</p>
+                                </div>
+                                <div class="card-back"><span>$$P(D) = \text{Prevalence}$$</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-indigo-600">Sequential Testing</h4>
+                                    <p class="mt-2 text-base">Using multiple tests to refine diagnosis over time.</p>
+                                </div>
+                                <div class="card-back"><span>$$P(D|T_1^+, T_2^+)$$<br><br>Yesterday's posterior = Today's prior</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <h4 class="text-xl font-bold text-orange-600">Test Comparison</h4>
+                                    <p class="mt-2 text-base">Comparing diagnostic test performance.</p>
+                                </div>
+                                <div class="card-back"><span>$$\frac{P(T^+|D)_A}{P(T^+|D)_B}$$<br><br>Which test better identifies disease?</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Updating Priors with Evidence</h3>
+                    <p class="mb-4">The key insight of Bayesian methods is <em>prior updating</em>: each piece of evidence transforms today's posterior probability into tomorrow's prior. This is exactly what happens when a patient gets multiple diagnostic tests.</p>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+                        <h4 class="text-xl font-semibold text-amber-700 mb-3">The Updating Process</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-semibold">Step 1</span>
+                                <p><strong>Start with Prior:</strong> Initial prevalence (your belief before testing)</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">Step 2</span>
+                                <p><strong>Observe Evidence:</strong> Test result (positive or negative)</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm font-semibold">Step 3</span>
+                                <p><strong>Calculate Posterior:</strong> Updated probability using Bayes' theorem</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm font-semibold">Repeat</span>
+                                <p><strong>Use as New Prior:</strong> For the next test or decision</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div id="sequential-controls" class="space-y-4">
+                            <h4 class="text-xl font-semibold text-indigo-700">Prior Updating Explorer</h4>
+                            <div>
+                                <label for="initial-prevalence" class="font-medium">Initial Prevalence (Prior): <span id="initial-prevalence-value" class="font-bold text-indigo-600">1%</span></label>
+                                <input type="range" id="initial-prevalence" min="0.1" max="50" value="1" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                            </div>
+                            <div>
+                                <label for="test-sensitivity" class="font-medium">Test Sensitivity: <span id="test-sensitivity-value" class="font-bold text-indigo-600">90%</span></label>
+                                <input type="range" id="test-sensitivity" min="70" max="99" value="90" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                            </div>
+                            <div>
+                                <label for="test-specificity" class="font-medium">Test Specificity: <span id="test-specificity-value" class="font-bold text-indigo-600">95%</span></label>
+                                <input type="range" id="test-specificity" min="70" max="99" value="95" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="add-positive-test-btn" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700">Add Positive Test</button>
+                                <button id="add-negative-test-btn" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700">Add Negative Test</button>
+                            </div>
+                            <button id="reset-sequence-btn" class="w-full bg-gray-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-gray-600">Reset to Initial Prior</button>
+                        </div>
+                        <div id="sequential-results" class="space-y-4">
+                            <h4 class="text-xl font-semibold text-green-700">Prior → Posterior Updates</h4>
+                            <div id="test-sequence" class="space-y-2">
+                                <div class="p-3 bg-gray-100 rounded">
+                                    <strong>Starting Prior:</strong> <span id="current-prior">1.0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Further Reading</h3>
+                    <p class="mb-4">The worked example in this demonstration comes from Gerd Gigerenzer's excellent book on communicating statistical risk:</p>
+                    <div class="text-center">
+                        <p class="text-lg font-semibold text-indigo-800"><em>Calculated Risks: How to Know When Numbers Deceive You</em></p>
+                        <p class="text-gray-600 mt-2">by Gerd Gigerenzer</p>
+                        <p class="text-sm text-gray-500 mt-3">Essential reading for understanding how to communicate Bayesian reasoning clearly and effectively.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -278,6 +437,7 @@
                 if (pageNum === '1') initFundamentals();
                 if (pageNum === '2') initInteractiveExplorer();
                 if (pageNum === '3') initWorkedExample();
+                if (pageNum === '4') initBayesianMethods();
             }
 
             navButtons.forEach(button => {
@@ -506,6 +666,149 @@
                 svg.append("circle").attr("cx", c_t_x).attr("cy", c_y).attr("r", r_t).style("fill", "#bfdbfe").style("stroke", "#2563eb").style("opacity", 0.7);
                 svg.append("text").attr("x", c_d_x).attr("y", c_y + r_d + 20).attr("text-anchor", "middle").text("Has Cancer (10)");
                 svg.append("text").attr("x", c_t_x).attr("y", c_y + r_t + 20).attr("text-anchor", "middle").text("Tests Positive (98)");
+            }
+
+            // --- PAGE 4: BAYESIAN METHODS LOGIC ---
+            let bayesianInitialized = false;
+            let testSequence = [];
+            
+            function initBayesianMethods() {
+                if (bayesianInitialized) return;
+                bayesianInitialized = true;
+                
+                // Initialize card flipping for concepts section
+                const conceptCards = document.querySelectorAll('#page-4 .info-card');
+                conceptCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        card.classList.toggle('is-flipped');
+                    });
+                });
+                
+                // Initialize prior updating explorer
+                const initialPrevalenceSlider = document.getElementById('initial-prevalence');
+                const testSensitivitySlider = document.getElementById('test-sensitivity');
+                const testSpecificitySlider = document.getElementById('test-specificity');
+                const addPositiveTestBtn = document.getElementById('add-positive-test-btn');
+                const addNegativeTestBtn = document.getElementById('add-negative-test-btn');
+                const resetSequenceBtn = document.getElementById('reset-sequence-btn');
+                
+                function updateSequentialDisplay() {
+                    const prevalence = parseFloat(initialPrevalenceSlider.value);
+                    const sensitivity = parseFloat(testSensitivitySlider.value);
+                    const specificity = parseFloat(testSpecificitySlider.value);
+                    
+                    document.getElementById('initial-prevalence-value').textContent = `${prevalence}%`;
+                    document.getElementById('test-sensitivity-value').textContent = `${sensitivity}%`;
+                    document.getElementById('test-specificity-value').textContent = `${specificity}%`;
+                    
+                    // Update current prior display
+                    const currentPrior = testSequence.length === 0 ? prevalence : testSequence[testSequence.length - 1].posterior;
+                    document.getElementById('current-prior').textContent = `${currentPrior.toFixed(1)}%`;
+                }
+                
+                function calculatePosterior(prior, sensitivity, specificity, testPositive) {
+                    const priorDecimal = prior / 100;
+                    const sensDecimal = sensitivity / 100;
+                    const specDecimal = specificity / 100;
+                    
+                    if (testPositive) {
+                        // Positive test: PPV calculation
+                        const tp = priorDecimal * sensDecimal;
+                        const fp = (1 - priorDecimal) * (1 - specDecimal);
+                        const totalPositive = tp + fp;
+                        return totalPositive > 0 ? (tp / totalPositive) * 100 : 0;
+                    } else {
+                        // Negative test: calculate P(D|T-) = P(T-|D)*P(D) / P(T-)
+                        const fn = priorDecimal * (1 - sensDecimal);
+                        const tn = (1 - priorDecimal) * specDecimal;
+                        const totalNegative = fn + tn;
+                        return totalNegative > 0 ? (fn / totalNegative) * 100 : 0;
+                    }
+                }
+                
+                function addTestResult(isPositive) {
+                    const prevalence = parseFloat(initialPrevalenceSlider.value);
+                    const sensitivity = parseFloat(testSensitivitySlider.value);
+                    const specificity = parseFloat(testSpecificitySlider.value);
+                    
+                    const currentPrior = testSequence.length === 0 ? prevalence : testSequence[testSequence.length - 1].posterior;
+                    const newPosterior = calculatePosterior(currentPrior, sensitivity, specificity, isPositive);
+                    
+                    testSequence.push({
+                        testNumber: testSequence.length + 1,
+                        prior: currentPrior,
+                        posterior: newPosterior,
+                        sensitivity: sensitivity,
+                        specificity: specificity,
+                        isPositive: isPositive
+                    });
+                    
+                    renderSequence();
+                }
+                
+                function renderSequence() {
+                    const sequenceDiv = document.getElementById('test-sequence');
+                    const prevalence = parseFloat(initialPrevalenceSlider.value);
+                    
+                    let html = `<div class="p-3 bg-gray-100 rounded">
+                        <strong>Starting Prior:</strong> <span id="current-prior">${prevalence.toFixed(1)}%</span>
+                    </div>`;
+                    
+                    testSequence.forEach((test, index) => {
+                        const change = test.posterior - test.prior;
+                        const resultColor = test.isPositive ? 'red' : 'green';
+                        const resultText = test.isPositive ? 'Positive' : 'Negative';
+                        const gradientColor = test.isPositive ? 'from-red-50 to-pink-50 border-red-200' : 'from-green-50 to-emerald-50 border-green-200';
+                        
+                        html += `
+                            <div class="p-3 bg-gradient-to-r ${gradientColor} border rounded">
+                                <div class="flex justify-between items-center">
+                                    <strong>Test ${test.testNumber} (${resultText})</strong>
+                                    <span class="text-sm text-gray-600">Sens: ${test.sensitivity}%, Spec: ${test.specificity}%</span>
+                                </div>
+                                <div class="mt-2">
+                                    <strong>Prior:</strong> ${test.prior.toFixed(1)}% → 
+                                    <strong class="text-${resultColor}-600">Posterior:</strong> ${test.posterior.toFixed(1)}%
+                                    <span class="text-sm ${change > 0 ? 'text-red-600' : 'text-green-600'}">
+                                        (${change > 0 ? '+' : ''}${change.toFixed(1)}%)
+                                    </span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    ${test.isPositive ? 
+                                        `$$P(D|T^+) = ${test.posterior.toFixed(1)}\\%$$` : 
+                                        `$$P(D|T^-) = ${test.posterior.toFixed(1)}\\%$$`}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    sequenceDiv.innerHTML = html;
+                    
+                    // Re-render math after updating content
+                    if (window.renderMathInElement) {
+                        renderMathInElement(sequenceDiv, {
+                            delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '$', right: '$', display: false}
+                            ]
+                        });
+                    }
+                }
+                
+                function resetSequence() {
+                    testSequence = [];
+                    renderSequence();
+                    updateSequentialDisplay();
+                }
+                
+                initialPrevalenceSlider.addEventListener('input', updateSequentialDisplay);
+                testSensitivitySlider.addEventListener('input', updateSequentialDisplay);
+                testSpecificitySlider.addEventListener('input', updateSequentialDisplay);
+                addPositiveTestBtn.addEventListener('click', () => addTestResult(true));
+                addNegativeTestBtn.addEventListener('click', () => addTestResult(false));
+                resetSequenceBtn.addEventListener('click', resetSequence);
+                
+                updateSequentialDisplay();
             }
 
             // Start on Page 1
