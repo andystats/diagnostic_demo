@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Risk Communication Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIARBEGPOdHdbmbGokj1/h4UFGYpgvGdSRvGMLcDiCES5NH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURPl3xCuPvnHNbBALuVSKwgoRljJfinKPOk2ttLXxvsKJVXXXGmkZM" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            background-color: #f8f9fa;
+        }
+        h1, h2, h3 {
+             font-family: 'Playfair Display', serif;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav-btn { transition: all 0.2s ease-in-out; }
+        .nav-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .theater-grid {
+            display: grid;
+            grid-template-columns: repeat(50, 1fr);
+            gap: 3px;
+            min-height: 180px;
+        }
+        .person-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: #d1d5db; /* Default grey */
+            transition: background-color 0.5s ease;
+        }
+        .venn-diagram-container { min-height: 350px; }
+        .formula {
+            font-family: 'Source Code Pro', monospace;
+            background: #e9ecef;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        /* Flashcard styles */
+        .info-card {
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 160px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+        }
+        .info-card.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Understanding Diagnostic Tests</h1>
+            <p class="mt-3 text-lg text-gray-600">From Bayesian Math to Communicating Risk</p>
+        </header>
+
+        <!-- Navigation -->
+        <div class="mb-8 flex justify-center bg-white p-2 rounded-xl shadow-md border border-gray-200">
+            <div class="flex space-x-2 rounded-lg bg-gray-100 p-1">
+                 <button class="nav-btn active py-2 px-6 rounded-lg font-semibold" data-page="1">1. The Math Basics</button>
+                 <button class="nav-btn py-2 px-6 rounded-lg font-semibold" data-page="2">2. Interactive Explorer</button>
+                 <button class="nav-btn py-2 px-6 rounded-lg font-semibold" data-page="3">3. A Worked Example</button>
+            </div>
+        </div>
+
+        <!-- PAGE 1: FUNDAMENTALS -->
+        <div id="page-1" class="page active bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">The Math Basics of Diagnostic Testing</h2>
+            <div class="space-y-8 text-lg text-gray-700 leading-relaxed">
+                <p>To evaluate a medical test, we start with its core properties. Click on each card to reveal the mathematical notation.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="info-card">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <h3 class="text-xl font-bold text-red-600">Prevalence</h3>
+                                <p class="mt-2 text-base">How common is the disease in the population? (The "prior probability").</p>
+                            </div>
+                            <div class="card-back"><span>$$P(D)$$</span></div>
+                        </div>
+                    </div>
+                     <div class="info-card">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <h3 class="text-xl font-bold text-pink-600">Sensitivity</h3>
+                                <p class="mt-2 text-base">If a person *has* the disease, how often is the test positive? (True Positive Rate).</p>
+                            </div>
+                            <div class="card-back"><span>$$P(T^+|D)$$</span></div>
+                        </div>
+                    </div>
+                     <div class="info-card">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <h3 class="text-xl font-bold text-green-600">Specificity</h3>
+                                <p class="mt-2 text-base">If a person is healthy, how often is the test negative? (True Negative Rate).</p>
+                            </div>
+                            <div class="card-back"><span>$$P(T^-|D')$$</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p>These properties don't answer the patient's crucial question: "I tested positive. What is the chance I actually have the disease?" That requires calculating the <em class="font-semibold">predictive values</em>.</p>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">The Predictive Values</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-xl font-bold text-green-700 mb-2">Positive Predictive Value (PPV)</h4>
+                            <p class="mb-3">Probability of disease, given a positive test.</p>
+                            <div class="formula"><span>$$PPV = P(D|T^+) = \frac{\text{TP}}{\text{TP} + \text{FP}}$$</span></div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-blue-700 mb-2">Negative Predictive Value (NPV)</h4>
+                            <p class="mb-3">Probability of no disease, given a negative test.</p>
+                            <div class="formula"><span>$$NPV = P(D'|T^-) = \frac{\text{TN}}{\text{TN} + \text{FN}}$$</span></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-6 pt-6 border-t font-semibold text-center text-indigo-700">Now, let's explore how these values change in the Interactive Explorer.</p>
+            </div>
+        </div>
+
+        <!-- PAGE 2: INTERACTIVE EXPLORER -->
+        <div id="page-2" class="page">
+             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Controls and Explanation -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md space-y-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 border-b pb-3">Outcome and test characteristics</h2>
+                    <!-- Sliders -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="prevalence" class="font-medium">Prevalence: <span id="prevalence-value" class="font-bold text-indigo-600">5%</span></label>
+                            <input type="range" id="prevalence" min="0.1" max="50" value="5" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                        </div>
+                        <div>
+                             <label for="sensitivity" class="font-medium">Sensitivity: <span id="sensitivity-value" class="font-bold text-indigo-600">95%</span></label>
+                            <input type="range" id="sensitivity" min="50" max="99.9" value="95" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                        </div>
+                        <div>
+                             <label for="specificity" class="font-medium">Specificity: <span id="specificity-value" class="font-bold text-indigo-600">90%</span></label>
+                            <input type="range" id="specificity" min="50" max="99.9" value="90" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1">
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="space-y-4 pt-4 border-t">
+                         <h2 class="text-2xl font-semibold text-gray-800">Results</h2>
+                         <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                             <h3 class="font-semibold text-lg text-green-700">Positive Predictive Value (PPV)</h3>
+                             <p id="ppv-value" class="text-4xl font-bold text-green-600 mt-1">...%</p>
+                         </div>
+                          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                             <h3 class="font-semibold text-lg text-blue-700">Negative Predictive Value (NPV)</h3>
+                             <p id="npv-value" class="text-4xl font-bold text-blue-600 mt-1">...%</p>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Visualizations -->
+                <div class="lg:col-span-3 space-y-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Theater of 1000 People</h2>
+                        <div id="theater-interactive" class="theater-grid p-2 bg-gray-100 rounded-lg"></div>
+                        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm text-gray-600">
+                            <span class="flex items-center"><div class="person-dot bg-pink-600 mr-2"></div><span id="tp-label">TP: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot bg-red-400 mr-2"></div><span id="fn-label">FN: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot bg-blue-400 mr-2"></div><span id="fp-label">FP: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot bg-green-500 mr-2"></div><span id="tn-label">TN: 0</span></span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Scaled Venn Diagram</h2>
+                        <div id="venn-interactive" class="venn-diagram-container flex justify-center items-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: WORKED EXAMPLE -->
+        <div id="page-3" class="page bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+            <div id="scenario" class="mb-8 p-6 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-lg">
+                <h2 class="text-2xl font-bold text-gray-800">A Worked Example: Communicating Risk</h2>
+                <p class="mt-2 text-gray-700">This interactive example walks through a classic scenario from Gerd Gigerenzer's book, "Calculated Risks," using natural frequencies to make the math intuitive.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <div class="mb-6 text-center md:text-left">
+                         <button id="advance-btn" class="nav-btn bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">Start Example</button>
+                    </div>
+                    <div id="steps-container" class="space-y-6">
+                        <!-- Steps will be populated by JS -->
+                    </div>
+                </div>
+                <div>
+                    <div class="sticky top-8">
+                        <h3 class="text-2xl font-bold text-center mb-2">Theater of 1000 Women</h3>
+                        <div id="theater-example" class="theater-grid p-2 bg-gray-100 rounded-lg shadow-inner"></div>
+                        <div id="venn-example" class="venn-diagram-container mt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Because the KaTeX scripts are deferred, they will run after the DOM is parsed.
+            // This event listener will run after that, so renderMathInElement should be available.
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+            
+            const pages = document.querySelectorAll('.page');
+            const navButtons = document.querySelectorAll('.nav-btn[data-page]');
+            
+            function switchPage(pageNum) {
+                pages.forEach(p => p.classList.remove('active'));
+                const newPage = document.getElementById(`page-${pageNum}`);
+                if (newPage) newPage.classList.add('active');
+
+                navButtons.forEach(b => {
+                    b.classList.toggle('active', b.dataset.page === pageNum);
+                });
+                
+                if (pageNum === '1') initFundamentals();
+                if (pageNum === '2') initInteractiveExplorer();
+                if (pageNum === '3') initWorkedExample();
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => switchPage(button.dataset.page));
+            });
+
+            // --- PAGE 1: FUNDAMENTALS LOGIC ---
+            let fundamentalsInitialized = false;
+            function initFundamentals() {
+                if (fundamentalsInitialized) return;
+                fundamentalsInitialized = true;
+                const cards = document.querySelectorAll('#page-1 .info-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        card.classList.toggle('is-flipped');
+                    });
+                });
+            }
+            
+            // --- PAGE 2: INTERACTIVE EXPLORER LOGIC ---
+            let explorerInitialized = false;
+            function initInteractiveExplorer() {
+                if (explorerInitialized) return;
+                explorerInitialized = true;
+
+                const prevalenceSlider = document.getElementById('prevalence');
+                const sensitivitySlider = document.getElementById('sensitivity');
+                const specificitySlider = document.getElementById('specificity');
+                const prevalenceValue = document.getElementById('prevalence-value');
+                const sensitivityValue = document.getElementById('sensitivity-value');
+                const specificityValue = document.getElementById('specificity-value');
+                const ppvValue = document.getElementById('ppv-value');
+                const npvValue = document.getElementById('npv-value');
+                const theaterDiv = document.getElementById('theater-interactive');
+                const vennDiv = document.getElementById('venn-interactive');
+                const tpLabel = document.getElementById('tp-label');
+                const fnLabel = document.getElementById('fn-label');
+                const fpLabel = document.getElementById('fp-label');
+                const tnLabel = document.getElementById('tn-label');
+                const POPULATION = 1000;
+
+                function updateExplorer() {
+                    const P_D = parseFloat(prevalenceSlider.value) / 100;
+                    const SENS = parseFloat(sensitivitySlider.value) / 100;
+                    const SPEC = parseFloat(specificitySlider.value) / 100;
+
+                    prevalenceValue.textContent = `${prevalenceSlider.value}%`;
+                    sensitivityValue.textContent = `${sensitivitySlider.value}%`;
+                    specificityValue.textContent = `${specificitySlider.value}%`;
+
+                    const hasDisease = POPULATION * P_D;
+                    const noDisease = POPULATION * (1 - P_D);
+                    const TP = Math.round(hasDisease * SENS);
+                    const FN = Math.round(hasDisease * (1 - SENS));
+                    const TN = Math.round(noDisease * SPEC);
+                    const FP = Math.round(noDisease * (1 - SPEC));
+                    const totalPositiveTests = TP + FP;
+                    const totalNegativeTests = TN + FN;
+
+                    const PPV = totalPositiveTests > 0 ? (TP / totalPositiveTests) * 100 : 0;
+                    const NPV = totalNegativeTests > 0 ? (TN / totalNegativeTests) * 100 : 0;
+
+                    ppvValue.textContent = `${PPV.toFixed(1)}%`;
+                    npvValue.textContent = `${NPV.toFixed(1)}%`;
+                    
+                    tpLabel.textContent = `TP: ${TP}`;
+                    fnLabel.textContent = `FN: ${FN}`;
+                    fpLabel.textContent = `FP: ${FP}`;
+                    tnLabel.textContent = `TN: ${TN}`;
+
+                    updateExplorerTheater(TP, FN, FP, TN);
+                    updateExplorerVenn(P_D, (totalPositiveTests / POPULATION));
+                }
+
+                function updateExplorerTheater(tp, fn, fp, tn) {
+                   theaterDiv.innerHTML = '';
+                    let people = [];
+                    for (let i = 0; i < tp; i++) people.push({ class: 'bg-pink-600' });
+                    for (let i = 0; i < fn; i++) people.push({ class: 'bg-red-400' });
+                    for (let i = 0; i < fp; i++) people.push({ class: 'bg-blue-400' });
+                    const remaining = POPULATION - (tp + fn + fp);
+                    for (let i = 0; i < remaining; i++) people.push({ class: 'bg-green-500' });
+                    people.sort(() => Math.random() - 0.5);
+
+                    people.forEach(p => {
+                        const dot = document.createElement('div');
+                        dot.className = `person-dot ${p.class}`;
+                        theaterDiv.appendChild(dot);
+                    });
+                }
+
+                function updateExplorerVenn(p_d, p_t_pos) {
+                    vennDiv.innerHTML = '';
+                    const width = vennDiv.clientWidth;
+                    const height = Math.max(vennDiv.clientHeight, 300); // Ensure min height
+                    const svg = d3.select("#venn-interactive").append("svg").attr("width", width).attr("height", height);
+                    const totalArea = Math.min(width, height) * Math.min(width, height) * 0.7;
+                    const r_d = Math.sqrt((totalArea * p_d) / Math.PI);
+                    const r_t = Math.sqrt((totalArea * p_t_pos) / Math.PI);
+                    if (r_d <= 0 && r_t <= 0) return;
+
+                    const distance = (r_d + r_t) * 0.5;
+                    const c_d_x = width / 2 - distance / 2;
+                    const c_t_x = width / 2 + distance / 2;
+                    const c_y = height / 2;
+
+                    svg.append("circle").attr("cx", c_d_x).attr("cy", c_y).attr("r", r_d).style("fill", "#fecaca").style("stroke", "#dc2626").style("opacity", 0.7);
+                    svg.append("circle").attr("cx", c_t_x).attr("cy", c_y).attr("r", r_t).style("fill", "#bfdbfe").style("stroke", "#2563eb").style("opacity", 0.7);
+                    
+                    svg.append("text").attr("x", c_d_x).attr("y", c_y + r_d + 20).attr("text-anchor", "middle").style("font-size", "14px").text("Has Disease");
+                    svg.append("text").attr("x", c_t_x).attr("y", c_y + r_t + 20).attr("text-anchor", "middle").style("font-size", "14px").text("Tests Positive");
+                }
+                
+                prevalenceSlider.addEventListener('input', updateExplorer);
+                sensitivitySlider.addEventListener('input', updateExplorer);
+                specificitySlider.addEventListener('input', updateExplorer);
+                window.addEventListener('resize', updateExplorer);
+                updateExplorer();
+            }
+
+            // --- PAGE 3: WORKED EXAMPLE LOGIC ---
+            let exampleInitialized = false;
+            let currentStep = 0;
+            const totalSteps = 7;
+
+            function initWorkedExample() {
+                if (exampleInitialized) return;
+                exampleInitialized = true;
+                
+                const stepsContent = [
+                    { title: '1. Start with 1,000 Women', text: "The <strong class='text-red-600'>Prevalence</strong> of breast cancer is 1%.", result: '<strong>10 women</strong> have cancer. The other 990 do not.'},
+                    { title: '2. Find the True Positives', text: "The test's <strong class='text-pink-600'>Sensitivity</strong> is 90%. Of the 10 women with cancer...", result: '<strong>9 women</strong> will correctly test positive (TP).'},
+                    { title: '3. Find the False Negatives', text: "The test will miss 10% of cases. Of the 10 women with cancer...", result: '<strong>1 woman</strong> will incorrectly test negative (FN).'},
+                    { title: '4. Find the False Positives', text: "The <strong class='text-blue-600'>False-Positive Rate</strong> is 9%. Of the 990 healthy women...", result: '<strong>89 women</strong> will incorrectly test positive (FP).'},
+                    { title: '5. Find the True Negatives', text: "<strong class='text-green-600'>Specificity</strong> is 91%. Of the 990 healthy women...", result: '<strong>901 women</strong> will correctly test negative (TN).'},
+                    { title: '6. Calculate the Final Probability', text: "A woman tests positive. What's her chance of having cancer? We look at all positive tests: 9 TP + 89 FP = 98 total.", result: 'The probability is 9 out of 98, which is about <strong class="text-3xl">9%</strong>.'},
+                    { title: '7. How to Communicate This', text: 'Using natural frequencies makes this surprising result clear and easy to explain to a patient.', result: '<p class="font-semibold">You could say:</p><p class="mt-2 italic">"About 100 women will get a positive result like yours, but only 9 of them actually have cancer. We need more tests to be sure."</p>'}
+                ];
+
+                const stepsContainer = document.getElementById('steps-container');
+                stepsContainer.innerHTML = stepsContent.map((s, i) => `
+                    <div id="step-${i+1}" class="step" style="opacity:0; transition: opacity 0.5s ease-in-out; display:none;">
+                        <h3 class="text-xl font-bold text-gray-800">${s.title}</h3>
+                        <p class="mt-1 text-gray-600">${s.text}</p><div class="mt-3 p-4 bg-white border rounded-lg">${s.result}</div>
+                    </div>`).join('');
+                
+                createExampleDots();
+                document.getElementById('advance-btn').addEventListener('click', advanceStep);
+                window.addEventListener('resize', updateExampleVenn);
+            }
+
+            function advanceStep() {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                } else {
+                    currentStep = 1; // Reset to the beginning
+                }
+                renderExampleState();
+                updateButtonText();
+            }
+
+            function updateButtonText() {
+                const advanceBtn = document.getElementById('advance-btn');
+                if (currentStep >= totalSteps) {
+                    advanceBtn.textContent = 'Replay Example';
+                } else if (currentStep === 0) {
+                    advanceBtn.textContent = 'Start Example';
+                } else {
+                    advanceBtn.textContent = 'Next Step';
+                }
+            }
+
+            function renderExampleState() {
+                const steps = document.querySelectorAll('#page-3 .step');
+                steps.forEach((step, index) => {
+                    const stepNumber = index + 1;
+                    if (stepNumber === currentStep) {
+                        step.style.display = 'block';
+                        setTimeout(() => step.style.opacity = '1', 10);
+                    } else if (stepNumber < currentStep) {
+                         step.style.opacity = '0.5';
+                    } else {
+                        step.style.display = 'none';
+                        step.style.opacity = '0';
+                    }
+                });
+                updateExampleTheater();
+                updateExampleVenn();
+            }
+
+            const POPULATION = 1000, P_D = 0.01, SENS = 0.90, SPEC = 0.91;
+            const FP_RATE = 1 - SPEC;
+            const hasDisease = POPULATION * P_D, noDisease = POPULATION * (1-P_D);
+            const TP = Math.round(hasDisease * SENS), FN = Math.round(hasDisease * (1 - SENS));
+            const FP = Math.round(noDisease * FP_RATE), TN = Math.round(noDisease * SPEC);
+
+            function createExampleDots() {
+                const theaterDiv = document.getElementById('theater-example');
+                theaterDiv.innerHTML = '';
+                for (let i = 0; i < POPULATION; i++) theaterDiv.appendChild(document.createElement('div')).className = 'person-dot';
+            }
+
+            function updateExampleTheater() {
+                const dots = document.getElementById('theater-example').children;
+                let assignments = [];
+                if (currentStep >= 1) for (let i = 0; i < hasDisease; i++) assignments.push('bg-red-600');
+                if (currentStep >= 2) for (let i = 0; i < TP; i++) assignments[i] = 'bg-pink-600';
+                if (currentStep >= 3) for (let i = TP; i < hasDisease; i++) assignments[i] = 'bg-red-400';
+                if (currentStep >= 4) for (let i = 0; i < FP; i++) assignments[hasDisease + i] = 'bg-blue-400';
+                if (currentStep >= 5) for (let i = 0; i < TN; i++) assignments[hasDisease + FP + i] = 'bg-green-500';
+                for (let i = 0; i < POPULATION; i++) dots[i].className = 'person-dot ' + (assignments[i] || 'bg-gray-300');
+            }
+            
+            function updateExampleVenn() {
+                const vennDiv = document.getElementById('venn-example');
+                vennDiv.innerHTML = '';
+                if (currentStep < 6) return;
+                const width = vennDiv.clientWidth, height = Math.max(vennDiv.clientHeight, 300);
+                const svg = d3.select("#venn-example").append("svg").attr("width", width).attr("height", height);
+                const totalArea = Math.min(width, height) * Math.min(width, height) * 0.7;
+                const r_d = Math.sqrt((totalArea * P_D) / Math.PI);
+                const r_t = Math.sqrt((totalArea * ((TP+FP)/POPULATION)) / Math.PI);
+                const distance = (r_d + r_t) * 0.4;
+                const c_d_x = width / 2 - distance / 2, c_t_x = width / 2 + distance / 2, c_y = height/2;
+                svg.append("circle").attr("cx", c_d_x).attr("cy", c_y).attr("r", r_d).style("fill", "#fecaca").style("stroke", "#dc2626").style("opacity", 0.7);
+                svg.append("circle").attr("cx", c_t_x).attr("cy", c_y).attr("r", r_t).style("fill", "#bfdbfe").style("stroke", "#2563eb").style("opacity", 0.7);
+                svg.append("text").attr("x", c_d_x).attr("y", c_y + r_d + 20).attr("text-anchor", "middle").text("Has Cancer (10)");
+                svg.append("text").attr("x", c_t_x).attr("y", c_y + r_t + 20).attr("text-anchor", "middle").text("Tests Positive (98)");
+            }
+
+            // Start on Page 1
+            switchPage('1');
+        });
+    </script>
+</body>
+</html>
+
