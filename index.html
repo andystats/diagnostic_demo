@@ -52,6 +52,11 @@
             background-color: #d1d5db; /* Default grey */
             transition: background-color 0.5s ease;
         }
+        /* Shape variants for outcome markers aw */
+        .person-dot.shape-circle { border-radius: 50%; transform: none; }
+        .person-dot.shape-square { border-radius: 2px; transform: none; }
+        .person-dot.shape-diamond { border-radius: 2px; transform: rotate(45deg) scale(0.85); transform-origin: center; }
+        .person-dot.shape-triangle { border-radius: 0; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .venn-diagram-container { min-height: 350px; }
         .formula {
             font-family: 'Source Code Pro', monospace;
@@ -217,10 +222,11 @@
                         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Theater of 1000 People</h2>
                         <div id="theater-interactive" class="theater-grid p-2 bg-gray-100 rounded-lg"></div>
                         <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm text-gray-600">
-                            <span class="flex items-center"><div class="person-dot bg-pink-600 mr-2"></div><span id="tp-label">TP: 0</span></span>
-                            <span class="flex items-center"><div class="person-dot bg-red-400 mr-2"></div><span id="fn-label">FN: 0</span></span>
-                            <span class="flex items-center"><div class="person-dot bg-blue-400 mr-2"></div><span id="fp-label">FP: 0</span></span>
-                            <span class="flex items-center"><div class="person-dot bg-green-500 mr-2"></div><span id="tn-label">TN: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot shape-circle bg-pink-600 mr-2"></div><span id="tp-label">TP: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot shape-square bg-red-400 mr-2"></div><span id="fn-label">FN: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot shape-diamond bg-blue-400 mr-2"></div><span id="fp-label">FP: 0</span></span>
+                            <span class="flex items-center"><div class="person-dot shape-triangle bg-green-500 mr-2"></div><span id="tn-label">TN: 0</span></span>
+                            <span class="flex items-center"><span id="total-label" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border">Total: 1000</span></span>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-md">
@@ -488,12 +494,13 @@
                     sensitivityValue.textContent = `${sensitivitySlider.value}%`;
                     specificityValue.textContent = `${specificitySlider.value}%`;
 
-                    const hasDisease = POPULATION * P_D;
-                    const noDisease = POPULATION * (1 - P_D);
+                    // Integer-consistent counts that always sum to POPULATION
+                    const hasDisease = Math.round(POPULATION * P_D);
+                    const noDisease = POPULATION - hasDisease;
                     const TP = Math.round(hasDisease * SENS);
-                    const FN = Math.round(hasDisease * (1 - SENS));
+                    const FN = hasDisease - TP;
                     const TN = Math.round(noDisease * SPEC);
-                    const FP = Math.round(noDisease * (1 - SPEC));
+                    const FP = noDisease - TN;
                     const totalPositiveTests = TP + FP;
                     const totalNegativeTests = TN + FN;
 
@@ -507,6 +514,8 @@
                     fnLabel.textContent = `FN: ${FN}`;
                     fpLabel.textContent = `FP: ${FP}`;
                     tnLabel.textContent = `TN: ${TN}`;
+                    const totalLabel = document.getElementById('total-label');
+                    if (totalLabel) totalLabel.textContent = `Total: ${TP + FN + FP + TN}`;
 
                     updateExplorerTheater(TP, FN, FP, TN);
                     updateExplorerVenn(P_D, (totalPositiveTests / POPULATION));
@@ -517,22 +526,22 @@
                     // Grouped layout: Disease (TP, FN) → No Disease (FP, TN)
                     for (let i = 0; i < tp; i++) {
                         const dot = document.createElement('div');
-                        dot.className = 'person-dot bg-pink-600';
+                        dot.className = 'person-dot shape-circle bg-pink-600';
                         theaterDiv.appendChild(dot);
                     }
                     for (let i = 0; i < fn; i++) {
                         const dot = document.createElement('div');
-                        dot.className = 'person-dot bg-red-400';
+                        dot.className = 'person-dot shape-square bg-red-400';
                         theaterDiv.appendChild(dot);
                     }
                     for (let i = 0; i < fp; i++) {
                         const dot = document.createElement('div');
-                        dot.className = 'person-dot bg-blue-400';
+                        dot.className = 'person-dot shape-diamond bg-blue-400';
                         theaterDiv.appendChild(dot);
                     }
                     for (let i = 0; i < tn; i++) {
                         const dot = document.createElement('div');
-                        dot.className = 'person-dot bg-green-500';
+                        dot.className = 'person-dot shape-triangle bg-green-500';
                         theaterDiv.appendChild(dot);
                     }
                 }
@@ -652,10 +661,10 @@
                 const dots = document.getElementById('theater-example').children;
                 let assignments = [];
                 if (currentStep >= 1) for (let i = 0; i < hasDisease; i++) assignments.push('bg-red-600');
-                if (currentStep >= 2) for (let i = 0; i < TP; i++) assignments[i] = 'bg-pink-600';
-                if (currentStep >= 3) for (let i = TP; i < hasDisease; i++) assignments[i] = 'bg-red-400';
-                if (currentStep >= 4) for (let i = 0; i < FP; i++) assignments[hasDisease + i] = 'bg-blue-400';
-                if (currentStep >= 5) for (let i = 0; i < TN; i++) assignments[hasDisease + FP + i] = 'bg-green-500';
+                if (currentStep >= 2) for (let i = 0; i < TP; i++) assignments[i] = 'bg-pink-600 shape-circle';
+                if (currentStep >= 3) for (let i = TP; i < hasDisease; i++) assignments[i] = 'bg-red-400 shape-square';
+                if (currentStep >= 4) for (let i = 0; i < FP; i++) assignments[hasDisease + i] = 'bg-blue-400 shape-diamond';
+                if (currentStep >= 5) for (let i = 0; i < TN; i++) assignments[hasDisease + FP + i] = 'bg-green-500 shape-triangle';
                 for (let i = 0; i < POPULATION; i++) dots[i].className = 'person-dot ' + (assignments[i] || 'bg-gray-300');
 
                 // Highlight what's NEW in this step for visual emphasis
